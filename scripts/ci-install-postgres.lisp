@@ -23,8 +23,11 @@
 (cl-repo:add-registry "https://ghcr.io" :namespace "egao1980/cl-systems" :priority :prepend)
 
 ;; Prefer GHCR once imports land; :ql is a temporary force until publish greens.
+;; cl-postgres ships inside the Quicklisp *postmodern* release — force-load it
+;; explicitly so dbd-postgres can resolve the ASDF component.
 (call-with-ci-muffles
  (lambda ()
+   (ql:quickload '("postmodern" "cl-postgres" "dbd-postgres" "dbd-sqlite3") :silent t)
    (cl-repo:ensure-system-dependencies "sql-protocol"
      :also-tests t
      :with '("sql-backend-sqlite3" "sql-backend-postgres")

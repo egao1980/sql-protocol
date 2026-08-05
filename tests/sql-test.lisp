@@ -57,11 +57,13 @@
       (sql-protocol:shutdown-pool pool))))
 
 (deftest postgres-skipped-unless-env
-  ;; Ship postgres backend code; live tests need SQL_POSTGRES=1.
+  ;; Live tests need SQL_POSTGRES=1 and sql-backend-postgres already loaded
+  ;; (see scripts/ci-test.lisp — load outside test-op).
   (let ((enabled (equal "1" (uiop:getenv "SQL_POSTGRES"))))
     (if enabled
         (progn
-          (asdf:load-system "sql-backend-postgres")
+          (unless (find-package :sql-backend-postgres)
+            (error "sql-backend-postgres not loaded — set up before SQL_POSTGRES=1 tests"))
           (sql-protocol:with-connection
               (conn :driver :postgres
                     :database-name (or (uiop:getenv "SQL_POSTGRES_DB") "postgres")
