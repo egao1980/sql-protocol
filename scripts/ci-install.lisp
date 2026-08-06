@@ -22,21 +22,12 @@
 
 (cl-repo:add-registry "https://ghcr.io" :namespace "egao1980/cl-systems" :priority :prepend)
 
+;; Deps resolve from GHCR (cl-stack-systems imports) then QL fallback.
 (call-with-ci-muffles
  (lambda ()
    (cl-repo:ensure-system-dependencies "sql-protocol"
      :also-tests t
-     :with '("sql-backend-sqlite3")
-     :sources '(("dbd-sqlite3" :ql)
-                ("dbi" :ql)
-                ("cl-dbi" :ql)
-                ("sqlite" :ql)
-                ("bordeaux-threads" :ql)
-                ("split-sequence" :ql)
-                ("closer-mop" :ql)
-                ("cl-ppcre" :ql)
-                ("trivial-garbage" :ql)
-                ("rove" :ql)))))
+     :with '("sql-backend-sqlite3"))))
 
 (format t "~&; ci: install phase done~%")
 (uiop:quit 0)
