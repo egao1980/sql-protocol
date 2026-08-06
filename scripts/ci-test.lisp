@@ -28,6 +28,10 @@
    (dolist (n '("dbd-sqlite3" "dbi" "sqlite" "bordeaux-threads" "rove"))
      (unless (asdf:find-system n nil)
        (ql:quickload n :silent t)))
+   (when (equal "1" (uiop:getenv "SQL_POSTGRES"))
+     ;; Load outside test-op so ASDF does not warn about recursive operate.
+     (dolist (n '("cl-postgres" "dbd-postgres" "sql-backend-postgres"))
+       (asdf:load-system n :verbose nil)))
    (asdf:test-system "sql-protocol")))
 
 (format t "~&; ci: tests ok~%")
