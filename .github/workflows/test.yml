@@ -1,14 +1,11 @@
-name: Test
+name: test
 
 on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
   workflow_dispatch:
-
-concurrency:
-  group: sql-protocol-test-${{ github.ref }}
-  cancel-in-progress: true
 
 env:
   SBCL_VERSION: 2.6.7
@@ -27,14 +24,11 @@ jobs:
       packages: read
     steps:
       - uses: actions/checkout@v5
-
       - uses: egao1980/cl-repository/.github/actions/setup-client@main
-
       - uses: egao1980/cl-repository/.github/actions/setup-roswell@main
         with:
           sbcl-version: ${{ env.SBCL_VERSION }}
           roswell-version: ${{ env.ROSWELL_VERSION }}
-
       - name: Install SQLite (Unix)
         if: runner.os != 'Windows'
         shell: bash
@@ -44,21 +38,18 @@ jobs:
           elif command -v brew >/dev/null 2>&1; then
             brew list sqlite >/dev/null 2>&1 || brew install sqlite
           fi
-
       - name: Install SQLite (Windows)
         if: runner.os == 'Windows'
         shell: bash
         run: choco install sqlite -y --no-progress
-
-      - name: cl-repo install deps
-        shell: bash
-        run: |
-          ros -l scripts/ci-install.lisp -q
-
-      - name: Test
-        shell: bash
-        run: |
-          ros -l scripts/ci-test.lisp -q
+      - uses: egao1980/cl-repository/.github/actions/ci@main
+        with:
+          phase: install
+          system: sql-protocol
+      - uses: egao1980/cl-repository/.github/actions/ci@main
+        with:
+          phase: test
+          system: sql-protocol
 
   postgres:
     runs-on: ubuntu-latest
@@ -79,33 +70,28 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+    env:
+      SQL_POSTGRES: "1"
+      SQL_POSTGRES_HOST: localhost
+      SQL_POSTGRES_PORT: "5432"
+      SQL_POSTGRES_USER: postgres
+      SQL_POSTGRES_PASSWORD: postgres
+      SQL_POSTGRES_DB: postgres
     steps:
       - uses: actions/checkout@v5
-
       - uses: egao1980/cl-repository/.github/actions/setup-client@main
-
       - uses: egao1980/cl-repository/.github/actions/setup-roswell@main
         with:
           sbcl-version: ${{ env.SBCL_VERSION }}
           roswell-version: ${{ env.ROSWELL_VERSION }}
-
       - name: Install libpq/sqlite
         run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev libpq-dev
-
-      - name: cl-repo install deps (+ postgres backend)
-        shell: bash
-        run: |
-          export CL_SOURCE_REGISTRY="$(pwd)//:$(pwd)/${CL_REPOSITORY_CLIENT_DIR}//:"
-          ros -l scripts/ci-install-postgres.lisp -q
-
-      - name: Test with Postgres
-        shell: bash
-        env:
-          SQL_POSTGRES: "1"
-          SQL_POSTGRES_HOST: localhost
-          SQL_POSTGRES_PORT: "5432"
-          SQL_POSTGRES_USER: postgres
-          SQL_POSTGRES_PASSWORD: postgres
-          SQL_POSTGRES_DB: postgres
-        run: |
-          ros -l scripts/ci-test.lisp -q
+      - uses: egao1980/cl-repository/.github/actions/ci@main
+        with:
+          phase: install
+          system: sql-protocol
+          with: sql-backend-postgres
+      - uses: egao1980/cl-repository/.github/actions/ci@main
+        with:
+          phase: test
+          system: sql-protocol
