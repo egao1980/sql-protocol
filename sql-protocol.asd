@@ -7,9 +7,7 @@
   :properties
   (:cl-repo
    (:ci (:with ("sql-backend-sqlite3")
-         :sources (("cl-postgres" :ql) ("dbd-postgres" :ql) ("cl-base64" :ql)
-                   ("ironclad" :ql) ("md5" :ql) ("uax-15" :ql)
-                   ("dbd-sqlite3" :oci) ("dbi" :oci) ("sqlite" :oci))
+         :sources (("dbd-sqlite3" :oci) ("dbi" :oci) ("sqlite" :oci))
          :load-before-test ("sql-backend-sqlite3"))))
   :serial t
   :pathname "src"
