@@ -6,7 +6,7 @@
   :depends-on ("uiop" "bordeaux-threads")
   :properties
   (:cl-repo
-   (:ci (:with ("sql-backend-sqlite3")
+   (:ci (:with ("sql-backend-sqlite3" "cl-postgres")
          :sources (("dbd-sqlite3" :oci) ("dbi" :oci) ("sqlite" :oci)
                    ("dbd-postgres" :oci) ("cl-postgres" :oci)
                    ("cl-base64" :oci) ("ironclad" :oci) ("md5" :oci)
