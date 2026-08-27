@@ -90,7 +90,7 @@ jobs:
         with:
           phase: install
           system: sql-protocol
-          with: sql-backend-postgres
+          with: sql-backend-postgres cl-postgres
       - uses: egao1980/cl-repository/.github/actions/ci@main
         with:
           phase: test
