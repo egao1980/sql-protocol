@@ -7,7 +7,6 @@
   :properties
   (:cl-repo
    (:ci (:with ("sql-backend-sqlite3" "cl-postgres")
-
          :load-before-test ("sql-backend-sqlite3"))))
   :serial t
   :pathname "src"
